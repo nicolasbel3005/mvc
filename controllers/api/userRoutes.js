@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const { User } = require('../../models');
+const withAuth = require('../../utils/auth');
 
 router.post('/', async (req, res) => {
   try {
@@ -47,7 +48,14 @@ router.post('/login', async (req, res) => {
     res.status(400).json(err);
   }
 });
-
+router.get('/me', async(req, res) =>{
+if (req.session.logged_in) {
+  let user = await User.findByPk(req.session.user_id)
+  res.json(user);
+}else {
+  res.json({message:"no_user_logged_in"});
+}
+})
 router.post('/logout', (req, res) => {
   if (req.session.logged_in) {
     req.session.destroy(() => {
